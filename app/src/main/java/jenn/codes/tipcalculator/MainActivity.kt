@@ -9,10 +9,7 @@ import android.support.v7.app.AppCompatActivity
 import android.text.InputType
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import java.util.ArrayList
 import com.bigkoo.pickerview.MyOptionsPickerView
 import kotlinx.android.synthetic.main.activity_main.*
@@ -25,7 +22,10 @@ class MainActivity : AppCompatActivity() {
     private var subTotalValue = 0F
     private var totalValue = 0F
     private var tipPercentValue = 0F
+    private var tipAmount = 0F
 
+    private lateinit var calculatorImage: ImageView
+    private val drawableResource = R.drawable.calculator
     private lateinit var calculateTipButton: Button
     private lateinit var resultText: TextView
     private lateinit var subTotal: EditText
@@ -37,6 +37,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        calculatorImage = findViewById(R.id.calculator)
+        calculatorImage.setImageResource(drawableResource)
         calculateTipButton = findViewById(R.id.btnCalc)
         resultText = findViewById(R.id.txtResult)
         subTotal = findViewById(R.id.inputTxtEdit)
@@ -68,23 +70,28 @@ class MainActivity : AppCompatActivity() {
                 //do a settext on your edit text
                 this@MainActivity.tipPercentValue = tipPercent
                 Toast.makeText(this@MainActivity, tipPercent.toString(), Toast.LENGTH_SHORT).show()
+                subTotalValue = subTotal.getText().toString().toFloat()
+                tipAmount = (tipPercentValue * subTotalValue)
+                spinnerText.hint = currencyFormat.format(tipAmount).toString()
+                spinnerText.clearFocus()
+                singlePicker.dismiss()
             }
         })
 
-        spinnerText.setOnClickListener {
-            println("XYZ Click Button")
-           // spinnerText.requestFocus()
-            spinnerText.onEditorAction(EditorInfo.IME_ACTION_DONE)
-            singlePicker.show()
-
-        }
+//        spinnerText.setOnClickListener {
+//            println("XYZ Click Button")
+//           // spinnerText.requestFocus()
+//            spinnerText.onEditorAction(EditorInfo.IME_ACTION_DONE)
+//            singlePicker.show()
+//
+//        }
         //editText.setOnFocusChangeListener { view, b -> doSomething(b) }
 
        spinnerText.setOnFocusChangeListener { view, hasFocus->
 
 
            println("XYZFocus Changed")
-           if(hasFocus)
+           if(spinnerText.hasFocus())
            {
                println("XYZhas focus")
                spinnerText.onEditorAction(EditorInfo.IME_ACTION_DONE)
@@ -95,7 +102,7 @@ class MainActivity : AppCompatActivity() {
            {
                println("XYZleav focus")
                //hide spinner
-
+               singlePicker.dismiss()
 
            }
        }
@@ -107,8 +114,6 @@ class MainActivity : AppCompatActivity() {
 
 
         calculateTipButton.setOnClickListener {
-
-            subTotalValue = subTotal.getText().toString().toFloat()
 
             total = subTotalValue + (subTotalValue * tipPercentValue)
             println(total.toString())

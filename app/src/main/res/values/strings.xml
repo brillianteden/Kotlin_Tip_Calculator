@@ -3,5 +3,5 @@
     <string name="editTxtHint">0.00</string>
     <string name="percentHint">Tip Percent</string>
     <string name="totalWithTip">0.00</string>
-    <string name="subtotalBeforeTip">Enter Subtotal</string>
+    <string name="subtotalBeforeTip">Enter Subtotal:</string>
 </resources>
