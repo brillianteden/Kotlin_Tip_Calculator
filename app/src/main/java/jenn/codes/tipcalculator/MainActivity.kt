@@ -1,26 +1,21 @@
+// Created by Eden Mugg 01/14/2019
+// This tip calculator implements a third party spinner
+
 package jenn.codes.tipcalculator
 
 import android.icu.text.NumberFormat
 import android.os.Bundle
-import android.support.design.widget.TextInputEditText
-import android.support.design.widget.TextInputLayout
-import android.support.v13.view.inputmethod.EditorInfoCompat
 import android.support.v7.app.AppCompatActivity
-import android.text.InputType
-import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import java.util.ArrayList
 import com.bigkoo.pickerview.MyOptionsPickerView
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main.view.*
-
 
 class MainActivity : AppCompatActivity() {
 
+    // gets appropriate currency for user location
     private val currencyFormat = NumberFormat.getCurrencyInstance()
     private var subTotalValue = 0F
-    private var totalValue = 0F
     private var tipPercentValue = 0F
     private var tipAmount = 0F
 
@@ -43,23 +38,31 @@ class MainActivity : AppCompatActivity() {
         resultText = findViewById(R.id.txtResult)
         subTotal = findViewById(R.id.inputTxtEdit)
         spinnerText = findViewById(R.id.inputTxtEdit2)
+
+        // third party library spinner
         val singlePicker = MyOptionsPickerView<String>(this@MainActivity)
+
+        // options for the spinner
         val items = ArrayList<String>()
         items.add("10%")
         items.add("15%")
         items.add("18%")
         items.add("20%")
         items.add("25%")
+
         singlePicker.setPicker(items)
         singlePicker.setTitle("Tip Percentage")
         singlePicker.setCyclic(false)
         singlePicker.setSelectOptions(0)
+
+        // listener recognizes when an option is selected
         singlePicker.setOnoptionsSelectListener(object : MyOptionsPickerView.OnOptionsSelectListener {
-            override fun onOptionsSelect(options1: Int, options2: Int, options3: Int) {
-                //  singleTVOptions.setText("Single Picker " + items.get(options1));
-                Toast.makeText(this@MainActivity, "" + items[options1], Toast.LENGTH_SHORT).show()
-                //vMasker.setVisibility(View.GONE)
+            override fun onOptionsSelect(options1: Int, option2: Int, options3: Int) {
+
+                // gets the option selected by the user
                 val selectedItem = items.get(options1)
+
+                // when statement to convert the percentage into a float
                 when (selectedItem) {
                     "10%" -> tipPercent = 0.10F
                     "15%" -> tipPercent = 0.15F
@@ -67,66 +70,51 @@ class MainActivity : AppCompatActivity() {
                     "20%" -> tipPercent = 0.20F
                     else -> tipPercent = 0.25F
                 }
-                //do a settext on your edit text
-                this@MainActivity.tipPercentValue = tipPercent
-                Toast.makeText(this@MainActivity, tipPercent.toString(), Toast.LENGTH_SHORT).show()
+
+                // get the subtotal provided by the user
                 subTotalValue = subTotal.getText().toString().toFloat()
+                tipPercentValue = tipPercent
+
+                // calculate tip amount
                 tipAmount = (tipPercentValue * subTotalValue)
+
+                // display tip amount in location specific format for the user
                 spinnerText.hint = currencyFormat.format(tipAmount).toString()
+
+                // removing the focus from this edit text is necessary for proper
+                // function of the third party spinner
                 spinnerText.clearFocus()
-                singlePicker.dismiss()
             }
         })
 
-//        spinnerText.setOnClickListener {
-//            println("XYZ Click Button")
-//           // spinnerText.requestFocus()
-//            spinnerText.onEditorAction(EditorInfo.IME_ACTION_DONE)
-//            singlePicker.show()
-//
-//        }
-        //editText.setOnFocusChangeListener { view, b -> doSomething(b) }
+        // onFocusChangeListener checks to see if the spinner has the focus
+        spinnerText.setOnFocusChangeListener { view, hasFocus->
 
-       spinnerText.setOnFocusChangeListener { view, hasFocus->
-
-
-           println("XYZFocus Changed")
+           // show the singlePicker only when it has the focus
            if(spinnerText.hasFocus())
            {
-               println("XYZhas focus")
+               // this line dismisses the standard keyboard to show the spinner
                spinnerText.onEditorAction(EditorInfo.IME_ACTION_DONE)
+
+               // show the spinner
                singlePicker.show()
-               //show spinner thing
            }
            else
            {
-               println("XYZleav focus")
-               //hide spinner
+               //hide spinner if it doesn't have the focus
                singlePicker.dismiss()
-
            }
-       }
-
-
-
-
-
-
-
-        calculateTipButton.setOnClickListener {
-
-            total = subTotalValue + (subTotalValue * tipPercentValue)
-            println(total.toString())
-
-            resultText.setText(currencyFormat.format(total).toString())
-
-            // Hide the keyboard.
-            //val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            //imm.hideSoftInputFromWindow(view.windowToken, 0)
         }
 
+        // onClickListener recognizes when the button is pressed
+        calculateTipButton.setOnClickListener {
 
-    }
+            // calculate the total
+            total = subTotalValue + (subTotalValue * tipPercentValue)
 
+            // display the total in the user location specific currency
+            resultText.setText(currencyFormat.format(total).toString())
+        }
     }
+}
 
